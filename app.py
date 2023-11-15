@@ -69,7 +69,7 @@ def read_serial_and_write_to_db():
 #            data =f"PL:{random.uniform(0, 5):.2f},UV:{random.uniform(0, 10):.2f},TE:{random.uniform(20, 30):.2f},HU:{random.uniform(40, 60):.2f}"
         
         data_parts = data.split(',')
-        
+        print(data_parts)
         data_dict = {}
 
         for part in data_parts:
