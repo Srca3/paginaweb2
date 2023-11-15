@@ -66,13 +66,13 @@ def read_serial_and_write_to_db():
     while True:
         try:
     #        if ser:
-            print(ser)
+            
             data = ser.readline().decode('utf-8').strip()
     #        else:
     #            data =f"PL:{random.uniform(0, 5):.2f},UV:{random.uniform(0, 10):.2f},TE:{random.uniform(20, 30):.2f},HU:{random.uniform(40, 60):.2f}"
             
             data_parts = data.split(',')
-            
+            print(data)
             data_dict = {}
             for part in data_parts:
                 # Verifica si la parte tiene un ':'
