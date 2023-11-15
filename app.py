@@ -72,10 +72,14 @@ def read_serial_and_write_to_db():
         data_parts = data.split(',')
         
         data_dict = {}
-
         for part in data_parts:
-            key, value = part.split(':')
-            data_dict[key.lower()] = float(value)
+            # Verifica si la parte tiene un ':'
+            if ':' in part:
+                key, value = part.split(':')
+                data_dict[key.lower()] = float(value)
+            else:
+                # Puedes manejar el caso en el que la parte no tiene ':', según tus necesidades
+                print(f"Error: La parte '{part}' no tiene el formato esperado.")
 
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
