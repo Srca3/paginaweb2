@@ -10,10 +10,10 @@ from io import BytesIO
 
 
 app = Flask(__name__)
-try:
-    ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
-except:
-    ser = None
+#try:
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+#except:
+#    ser = None
 db_path = 'data.db'
 
 # Función para crear la tabla en la base de datos
@@ -63,10 +63,10 @@ def start_serial_reading():
 
 def read_serial_and_write_to_db():
     while True:
-        if ser:
-            data = ser.readline().decode('utf-8').strip()
-        else:
-            data =f"PL:{random.uniform(0, 5):.2f},UV:{random.uniform(0, 10):.2f},TE:{random.uniform(20, 30):.2f},HU:{random.uniform(40, 60):.2f}"
+#        if ser:
+        data = ser.readline().decode('utf-8').strip()
+#        else:
+#            data =f"PL:{random.uniform(0, 5):.2f},UV:{random.uniform(0, 10):.2f},TE:{random.uniform(20, 30):.2f},HU:{random.uniform(40, 60):.2f}"
         
         data_parts = data.split(',')
         
