@@ -62,34 +62,39 @@ def start_serial_reading():
     serial_thread.start()
 
 def read_serial_and_write_to_db():
+
     while True:
-#        if ser:
-        print(ser)
-        data = ser.readline().decode('utf-8').strip()
-#        else:
-#            data =f"PL:{random.uniform(0, 5):.2f},UV:{random.uniform(0, 10):.2f},TE:{random.uniform(20, 30):.2f},HU:{random.uniform(40, 60):.2f}"
-        
-        data_parts = data.split(',')
-        
-        data_dict = {}
-        for part in data_parts:
-            # Verifica si la parte tiene un ':'
-            if ':' in part:
-                key, value = part.split(':')
-                data_dict[key.lower()] = float(value)
-            else:
-                # Puedes manejar el caso en el que la parte no tiene ':', según tus necesidades
-                print(f"Error: La parte '{part}' no tiene el formato esperado.")
+        try:
+    #        if ser:
+            print(ser)
+            data = ser.readline().decode('utf-8').strip()
+    #        else:
+    #            data =f"PL:{random.uniform(0, 5):.2f},UV:{random.uniform(0, 10):.2f},TE:{random.uniform(20, 30):.2f},HU:{random.uniform(40, 60):.2f}"
+            
+            data_parts = data.split(',')
+            
+            data_dict = {}
+            for part in data_parts:
+                # Verifica si la parte tiene un ':'
+                if ':' in part:
+                    key, value = part.split(':')
+                    data_dict[key.lower()] = float(value)
+                else:
+                    # Puedes manejar el caso en el que la parte no tiene ':', según tus necesidades
+                    print(f"Error: La parte '{part}' no tiene el formato esperado.")
 
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
 
-        cursor.execute('''
-            INSERT INTO weather_data (lluvia, radiacion_uv, temperatura, humedad)
-            VALUES (?, ?, ?, ?)
-        ''', (data_dict['pl'], data_dict['uv'], data_dict['te'], data_dict['hu']))
-        conn.commit()
-        conn.close()
+            cursor.execute('''
+                INSERT INTO weather_data (lluvia, radiacion_uv, temperatura, humedad)
+                VALUES (?, ?, ?, ?)
+            ''', (data_dict['pl'], data_dict['uv'], data_dict['te'], data_dict['hu']))
+            conn.commit()
+            conn.close()
+        except:
+            print("Error al recibir datos")
+            pass
   # Ajusta según la frecuencia de los datos del puerto serial
 
 def fetch_last_10_records():
