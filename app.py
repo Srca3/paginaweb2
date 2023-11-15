@@ -85,8 +85,7 @@ def read_serial_and_write_to_db():
         ''', (data_dict['pl'], data_dict['uv'], data_dict['te'], data_dict['hu']))
         conn.commit()
         conn.close()
-
-        time.sleep(10)  # Ajusta según la frecuencia de los datos del puerto serial
+  # Ajusta según la frecuencia de los datos del puerto serial
 
 def fetch_last_10_records():
     conn = sqlite3.connect(db_path)
