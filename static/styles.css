@@ -104,12 +104,18 @@ footer {
     position: fixed;
     width: 100%;
     bottom: 0;
+    transition: transform 0.3s ease; /* Agregamos una transición para que sea suave */
 }
 
 h1, h3, h4, h5, h6 {
     color: #fff;
 }
-canvas {
-    border: 1px solid #ccc;
-    margin-bottom: 10px;
+.graph-container canvas {
+    width: 80%; /* Puedes ajustar el ancho según tus necesidades */
+    height: auto; /* Esto permite que la altura se ajuste automáticamente */
+    margin: 20px auto; /* Ajusta el margen según tus necesidades */
+    display: block;
+}
+.hidden {
+    transform: translateY(100%); /* Desplaza el footer hacia abajo para ocultarlo */
 }
