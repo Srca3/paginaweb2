@@ -109,3 +109,7 @@ footer {
 h1, h3, h4, h5, h6 {
     color: #fff;
 }
+canvas {
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
