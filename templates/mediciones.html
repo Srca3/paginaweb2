@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mediciones en Tiempo Real</title>
     <link rel="stylesheet" href="static/styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
+
 <body>
 
     <header>
@@ -29,143 +31,84 @@
         <!-- Contenedor para los gráficos -->
         <div class="graph-container">
             <!-- Gráfico para la lluvia -->
-            <canvas id="rainChart" width="300" height="150"></canvas>
+            <svg id="rainChart" width="300" height="150"></svg>
 
             <!-- Gráfico para la radiación UV -->
-            <canvas id="uvChart" width="300" height="150"></canvas>
+            <svg id="uvChart" width="300" height="150"></svg>
 
             <!-- Gráfico para la temperatura -->
-            <canvas id="temperatureChart" width="300" height="150"></canvas>
+            <svg id="temperatureChart" width="300" height="150"></svg>
 
             <!-- Gráfico para la humedad -->
-            <canvas id="humidityChart" width="300" height="150"></canvas>
+            <svg id="humidityChart" width="300" height="150"></svg>
         </div>
     </section>
 
     <footer>
         <p>&copy; 2023 EcoClimateHubUDEP</p>
     </footer>
+
     <script>
-        // Inicializa los datos y las opciones para los gráficos
-        var rainData = {
-            labels: [],
-            datasets: [{
-                label: 'Lluvia',
-                data: [],
-                fill: false,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                tension: 0.1
-            }]
-        };
+        // Function to create/update charts using D3.js
+        function updateChartsD3(data, chartId, color) {
+            const margin = { top: 10, right: 30, bottom: 30, left: 60 };
+            const width = 300 - margin.left - margin.right;
+            const height = 150 - margin.top - margin.bottom;
 
-        var uvData = {
-            labels: [],
-            datasets: [{
-                label: 'Radiación UV',
-                data: [],
-                fill: false,
-                borderColor: 'rgba(255, 99, 132, 1)',
-                tension: 0.1
-            }]
-        };
+            const svg = d3.select(`#${chartId}`)
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
 
-        var temperatureData = {
-            labels: [],
-            datasets: [{
-                label: 'Temperatura',
-                data: [],
-                fill: false,
-                borderColor: 'rgba(255, 99, 132, 1)',
-                tension: 0.1
-            }]
-        };
+            const x = d3.scaleTime()
+                .domain(d3.extent(data, d => new Date(d[1])))
+                .range([0, width]);
 
-        var humidityData = {
-            labels: [],
-            datasets: [{
-                label: 'Humedad',
-                data: [],
-                fill: false,
-                borderColor: 'rgba(54, 162, 235, 1)',
-                tension: 0.1
-            }]
-        };
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d[2])])
+                .range([height, 0]);
 
-        // Crea los gráficos
-        var rainChart = new Chart(document.getElementById('rainChart').getContext('2d'), {
-            type: 'line',
-            data: rainData
-        });
+            const line = d3.line()
+                .x(d => x(new Date(d[1])))
+                .y(d => y(d[2]));
 
-        var uvChart = new Chart(document.getElementById('uvChart').getContext('2d'), {
-            type: 'line',
-            data: uvData
-        });
+            svg.append("path")
+                .datum(data)
+                .attr("fill", "none")
+                .attr("stroke", color)
+                .attr("stroke-width", 1.5)
+                .attr("d", line);
 
-        var temperatureChart = new Chart(document.getElementById('temperatureChart').getContext('2d'), {
-            type: 'line',
-            data: temperatureData
-        });
+            svg.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(x));
 
-        var humidityChart = new Chart(document.getElementById('humidityChart').getContext('2d'), {
-            type: 'line',
-            data: humidityData
-        });
+            svg.append("g")
+                .call(d3.axisLeft(y));
+        }
 
-        // Función para actualizar los datos y los gráficos en tiempo real
-    function updateCharts() {
-    // Obtiene los datos del servidor Flask
-    fetch('/data')
-        .then(response => response.json())
-        .then(data => {
-            // Actualiza las etiquetas de tiempo
-            data.forEach(entry => {
-                var time = new Date(entry[1]).toLocaleTimeString();
-                rainData.labels.push(time);
-                uvData.labels.push(time);
-                temperatureData.labels.push(time);
-                humidityData.labels.push(time);
-            });
+        // Fetch data and update charts using D3.js
+        function updateCharts() {
+            fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    // Update charts for each type of data
+                    updateChartsD3(data, 'rainChart', 'rgba(75, 192, 192, 1)');
+                    updateChartsD3(data, 'uvChart', 'rgba(255, 99, 132, 1)');
+                    updateChartsD3(data, 'temperatureChart', 'rgba(255, 150, 79, 1)');
+                    updateChartsD3(data, 'humidityChart', 'rgba(119, 221, 119, 1)');
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
 
-            // Limita la cantidad de etiquetas a mostrar
-            const maxLabels = 50;
-            if (rainData.labels.length > maxLabels) {
-                rainData.labels.splice(0, data.length);
-                uvData.labels.splice(0, data.length);
-                temperatureData.labels.splice(0, data.length);
-                humidityData.labels.splice(0, data.length);
-            }
-
-            // Actualiza los datos de los gráficos
-            data.forEach(entry => {
-                rainData.datasets[0].data.push(entry[2]);
-                uvData.datasets[0].data.push(entry[3]);
-                temperatureData.datasets[0].data.push(entry[4]);
-                humidityData.datasets[0].data.push(entry[5]);
-            });
-
-            // Limita la cantidad de datos a mostrar
-            if (rainData.datasets[0].data.length > maxLabels) {
-                rainData.datasets[0].data.splice(0, data.length);
-                uvData.datasets[0].data.splice(0, data.length);
-                temperatureData.datasets[0].data.splice(0, data.length);
-                humidityData.datasets[0].data.splice(0, data.length);
-            }
-
-            // Actualiza los gráficos
-            rainChart.update();
-            uvChart.update();
-            temperatureChart.update();
-            humidityChart.update();
-        })
-        .catch(error => console.error('Error fetching data:', error));
-}
-        // Llama a la función de inicialización al cargar la página
+        // Call the updateCharts function on page load
         updateCharts();
 
-        // Actualiza los gráficos cada 5 segundos (ajusta según sea necesario)
-        setInterval(updateCharts, 10000);
+        // Update charts every 5 seconds (adjust as needed)
+        setInterval(updateCharts, 5000);
     </script>
 
 </body>
+
 </html>
