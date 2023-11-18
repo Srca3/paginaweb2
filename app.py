@@ -10,10 +10,10 @@ from io import BytesIO
 
 
 app = Flask(__name__)
-try:
+try:#Quitar esta linea para cambiar de modo
     ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
-except:
-    ser = None
+except:#Quitar esta linea para cambiar de modo
+    ser = None#Quitar esta linea para cambiar de modo
 db_path = 'data.db'
 
 # Función para crear la tabla en la base de datos
@@ -65,11 +65,11 @@ def read_serial_and_write_to_db():
 
     while True:
         try:
-            if ser:
+            if ser:#Quitar esta linea para cambiar de modo
             
                 data = ser.readline().decode('utf-8').strip()
-            else:
-                data =f"PL:{random.uniform(0, 5):.2f},UV:{random.uniform(0, 10):.2f},TE:{random.uniform(20, 30):.2f},HU:{random.uniform(40, 60):.2f}"
+            else:#Quitar esta linea para cambiar de modo
+                data =f"PL:{random.uniform(0, 5):.2f},UV:{random.uniform(0, 10):.2f},TE:{random.uniform(20, 30):.2f},HU:{random.uniform(40, 60):.2f}"#Quitar esta linea para cambiar de modo
             
             data_parts = data.split(',')
             print(data)
@@ -95,6 +95,7 @@ def read_serial_and_write_to_db():
         except:
             print("Error al recibir datos")
             pass
+        time.sleep(5)#Quitar esta linea para cambiar de modo
   # Ajusta según la frecuencia de los datos del puerto serial
 
 def fetch_last_10_records():
